@@ -5,6 +5,18 @@ faker.locale = 'pt_BR';
 
 const connection = require('./connectionDb');
 
+// Cria a tabela caso ela não exista ao iniciar o app
+const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS peoples (
+        id INT NOT NULL AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        PRIMARY KEY (id)
+    );
+`;
+connection.query(createTableQuery, (err) => {
+    if (err) console.error('Erro ao criar tabela:', err);
+});
+
 routes.get('/', (_, res) => {
     const sql = `INSERT INTO peoples(name) VALUES('${faker.name.findName()}')`;
     connection.query(sql);

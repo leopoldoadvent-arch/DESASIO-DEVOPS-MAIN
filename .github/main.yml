@@ -1,0 +1,38 @@
+name: CI/CD Pipeline
+
+# 1. Define quando a esteira vai rodar (toda vez que houver push na branch main)
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Passo 1: Baixa o código do seu repositório para a máquina virtual do GitHub
+    - name: Checkout do código
+      uses: actions/checkout@v4
+
+    # Passo 2: Faz o login seguro no seu Docker Hub usando variáveis ocultas (Secrets)
+    - name: Login no Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # Passo 3: Constrói a imagem do Node e envia para o seu Docker Hub
+    - name: Build e Push da aplicação Node
+      uses: docker/build-push-action@v5
+      with:
+        context: ./node
+        push: true
+        tags: javielrezende/node-app:latest
+
+    # Passo 4: Constrói a imagem do Nginx e envia para o seu Docker Hub
+    - name: Build e Push do Nginx
+      uses: docker/build-push-action@v5
+      with:
+        context: ./nginx
+        push: true
+        tags: javielrezende/nginx:latest
